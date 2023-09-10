@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>
+			Collision detect
+	</title>
+</head>
+<body style="background-color: rgb(0, 0, 0);">
+	<canvas id="mycanvas" style="background-color: rgb(255, 255, 255);" tabindex='1' width="600" height="600">
+		Hola
+	</canvas>
+
+	<audio id="coinAudio" src="dkcoin.mp3">a</audio>
+	
+	<script type="text/javascript">
+		class Rectangle {
+			constructor(x, y, w, h, img) {
+				this.x = x;
+				this.y = y;
+				this.w = w;
+				this.h = h;
+				this.img = img;
+			}
+
+			paint(){
+				ctx.beginPath();
+				if(this.img == null){
+					ctx.fillRect (this.x, this.y, this.w, this.h);
+				}
+				else{
+					window.onload = ctx.drawImage(this.img, this.x, this.y, this.w, this.h);
+				}
+				
+			}
+
+			strokePaint(){
+				ctx.beginPath();
+				ctx.fillRect (this.x, this.y, this.w, this.h);
+				ctx.strokeRect (this.x, this.y, this.w, this.h);
+			}
+		}
+
+		var cv = document.getElementById('mycanvas');
+		var ctx = cv.getContext('2d');
+
+		var coinAudio = document.getElementById('coinAudio');
+
+		var playerImg = new Image();
+		playerImg.src = "caballero.jpg";
+
+		var objetivo1Img = new Image();
+		objetivo1Img.src = "cofre.jpg";
+
+		var player = new Rectangle(370,370, 60, 60, playerImg);
+		var objetivo1 = new Rectangle (25,25,35,35, objetivo1Img);
+		
+		var muros = [];
+		muros.push(new Rectangle(150,50, 300, 30));
+		muros.push(new Rectangle(150,520, 300, 30));
+
+		var dir = 0;
+		var speed = 10;
+		var score = 0;
+		var pause = false;
+		var wallCollisionCheck = -1;
+
+		ctx.fillStyle = "black";
+		objetivo1.paint();
+
+		ctx.fillStyle = "gray";
+		for(i=0; i< muros.length; i++)
+		{
+			muros[i].paint();
+		}
+
+		ctx.fillStyle = random_rgba();
+		player.paint();
+
+		
+		cv.addEventListener("keydown", (e) => {
+			if(e.code == "Space") {
+				if(pause == true){
+					pause = false; 
+					window.requestAnimationFrame(update);
+				} 
+				else{
+					pause = true;
+					repaint();
+				}
+			}
+
+			if(e.code == "ArrowUp" || e.code == "ArrowDown" || e.code == "ArrowRight" || e.code == "ArrowLeft" ){
+				if(pause == false){
+					if(e.code == "ArrowUp") dir = 1;
+					if(e.code == "ArrowDown") dir = 2;
+					if(e.code == "ArrowRight") dir = 3;
+					if(e.code == "ArrowLeft") dir = 4;
+
+					speed += 1;
+				}
+			}
+		});
+
+		function update(){
+			if(pause == false){
+				
+				wallCollisionCheck = wallCollision();
+
+				if(dir == 1) {
+					if(wallCollisionCheck == -1) player.y -= speed;
+					if(wallCollisionCheck >= 0) player.y = muros[wallCollisionCheck].y + muros[wallCollisionCheck].h + 1;
+					if(player.y <= -50) player.y = 600;
+				}
+				if(dir == 2) {
+					if(wallCollisionCheck == -1) player.y += speed;
+					if(wallCollisionCheck >= 0) player.y = muros[wallCollisionCheck].y - player.h - 1;
+					if(player.y >= 600) player.y = -50;
+				}
+				if(dir == 3) {
+					if(wallCollisionCheck == -1) player.x += speed;
+					if(wallCollisionCheck >= 0) player.x = muros[wallCollisionCheck].x - player.w - 1;
+					if(player.x >= 600) player.x = -50;
+				}
+				if(dir == 4) {
+					if(wallCollisionCheck == -1) player.x -= speed;
+					if(wallCollisionCheck >= 0) player.x = muros[wallCollisionCheck].x + muros[wallCollisionCheck].w + 1;
+					if(player.x <= -50) player.x = 600;
+				}
+				if(wallCollisionCheck >= 0){
+					wallCollisionCheck = -1;
+					dir = 0;
+				}
+
+				rectCollision();
+				repaint();
+				window.requestAnimationFrame(update);
+			}
+		}
+
+		function repaint(){
+			if(pause == false){
+				ctx.beginPath();
+				ctx.fillStyle = "white";
+				ctx.fillRect (0, 0, cv.width , cv.height);
+
+				ctx.fillStyle = "black";
+				objetivo1.paint();
+
+				ctx.fillStyle = "gray";
+				for(i=0; i< muros.length; i++)
+				{
+					muros[i].paint();
+				}
+
+				ctx.beginPath();
+				ctx.font = "20px Comic Sans";
+				ctx.fillStyle = "rgb(0,0,0)";
+				ctx.fillText("Score: "+ score, 480, 30);
+
+				ctx.strokeStyle = "rgb(0,0,0)";
+				ctx.strokeText("Score", 480, 30);
+
+				ctx.fillStyle = random_rgba();
+				player.paint();
+			}
+			else{
+				ctx.beginPath();
+				ctx.fillStyle = "rgba(0,0,0,0.5)";
+				ctx.fillRect(0,0,cv.width, cv.height);
+
+				ctx.font = "bold 70px Comic Sans Ms";
+				ctx.fillStyle = "rgb(255,255,255)";
+				ctx.fillText("P A U S E", 120, 300);
+
+				ctx.strokeStyle = "rgb(0,0,0)";  ctx.lineWidth = 3;
+				ctx.strokeText("P A U S E", 120, 300); ctx.lineWidth = 1;
+			}
+		}
+
+		function rectCollision(){
+			if(player.x < objetivo1.x + objetivo1.w &&  
+				player.x + player.w > objetivo1.x &&
+				player.y < objetivo1.y + objetivo1.h &&
+				player.y + player.h > objetivo1.y)
+			{  
+				objetivo1.x = Math.random() * (cv.width - objetivo1.w - 4) + objetivo1.w + 2;
+				objetivo1.y = Math.random() * (cv.height - objetivo1.w - 4) + objetivo1.w + 2;
+
+				score += 10;
+
+				coinAudio.play();
+			}
+		}
+
+		function wallCollision(){
+			for(i=0; i< muros.length; i++)
+			{
+				if(player.x < muros[i].x + muros[i].w &&  
+				player.x + player.w > muros[i].x &&
+				player.y < muros[i].y + muros[i].h &&
+				player.y + player.h > muros[i].y)
+				{  
+					return i;
+				}
+			}
+
+			return -1;
+		}
+
+		window.requestAnimationFrame = (function () {
+			return window.requestAnimationFrame ||
+			window.webkitRequestAnimationFrame ||
+			window.mozRequestAnimationFrame ||
+			function (callback) {
+				window.setTimeout(callback, 20);
+			};
+		}());
+
+		window.requestAnimationFrame(update);
+/*
+		cv.addEventListener("keydown", (e) => {
+			if(e.code == "Space")
+			{
+				ctx.beginPath();
+				ctx.fillStyle = random_rgba();
+
+				randomx = Math.floor(Math.random() * (cv.width-cuadroTamaño));
+				randomy = Math.floor(Math.random() * (cv.height-cuadroTamaño));
+
+				ctx.fillRect (randomx, randomy,cuadroTamaño,cuadroTamaño);
+				ctx.strokeRect (randomx, randomy,cuadroTamaño,cuadroTamaño);
+			}
+		});
+*/
+
+/*
+		cv.addEventListener("click", (e) => {
+			
+			ctx.beginPath();
+			ctx.fillStyle = random_rgba();
+			
+			if(figura){
+				ctx.fillRect (e.layerX-(cuadroTamaño/2), e.layerY-(cuadroTamaño/2),cuadroTamaño,cuadroTamaño);
+				ctx.strokeRect (e.layerX-(cuadroTamaño/2), e.layerY-(cuadroTamaño/2),cuadroTamaño,cuadroTamaño);
+			}
+			else {
+				ctx.arc(e.layerX, e.layerY,25,0, 2*Math.PI);
+				ctx.stroke();
+				ctx.fill();
+			}
+		})
+
+		cv.addEventListener("mouseover", (e) => {
+			ctx.fillStyle = random_rgba();
+		})
+
+		cv.addEventListener("mouseout", (e) => {
+			figura = !figura;
+		})
+
+		cv.addEventListener("mousemove", (e) => {
+			if(press){
+				ctx.beginPath();
+				ctx.fillStyle = "black";
+				ctx.arc(e.layerX, e.layerY,2,0, 2*Math.PI);
+				ctx.stroke();
+				ctx.fill();
+			}
+		})
+
+		cv.addEventListener("mousedown", (e) => {
+			press = true;
+		})
+
+		cv.addEventListener("mouseup", (e) => {
+			press = false;
+		})
+*/
+
+/*		//tres cuadrados encimados
+		ctx.fillStyle = "rgb(200,0,0)"; //funcion
+		ctx.fillRect (10,10,55,50); //atributo
+
+		ctx.fillStyle = "rgba(0,0,200,0.5)";
+		ctx.fillRect (55,50,55,50);	
+
+		ctx.fillStyle = "rgba(0,200,0)";
+		ctx.fillRect (100,90,55,50);	
+
+		//linea
+		ctx.moveTo(220,45); //punto/coordenada incial
+		ctx.lineTo(420,145); //punto final
+		ctx.stroke(); //para dibujarse el contorno
+	
+		//triangulo
+		ctx.moveTo(350,220); 
+		ctx.lineTo(310,91);
+		ctx.lineTo(200,150);
+		ctx.lineTo(350,220);
+		ctx.strokeStyle = "blue"; //colorear borde
+		ctx.stroke();
+		ctx.fill(); //para rellenar la figura
+
+		//circulo - arc
+		ctx.lineWidth = 10;
+		ctx.beginPath();
+		ctx.arc(100,350,75,0, 2*Math.PI);
+		ctx.stroke();
+
+		ctx.beginPath();
+		ctx.arc(275,350,75,0, 2*Math.PI);
+		ctx.stroke();
+		ctx.fill();
+
+		ctx.lineWidth = 1;
+
+		//Texto
+		ctx.font = "70px Arial";
+		ctx.fillStyle = "rgba(120,110,50)";
+		ctx.fillText("Hola lalo", 500, 100);
+
+		ctx.strokeStyle = "rgba(180,130,80)";
+		ctx.strokeText("Hola lalo", 495, 95);
+
+		//Crear un gradiante
+		ctx.beginPath();
+		var grd = ctx.createLinearGradient(500, 350, 750, 550);
+		grd.addColorStop(0, "yellow");
+		grd.addColorStop(0.33, "gold");
+		grd.addColorStop(0.66, "orange");
+		grd.addColorStop(1, "red");
+		ctx.fillStyle = grd;
+		ctx.fillRect(500, 350, 250, 200);
+
+		//Crear una gradiante radial
+		ctx.beginPath();
+		var grd2 = ctx.createRadialGradient(275, 500, 1, 300, 510, 80);
+		grd2.addColorStop(0, "blue");
+		grd2.addColorStop(0.5, "green");
+		grd2.addColorStop(1, "purple");
+		ctx.fillStyle = grd2;
+		ctx.fillRect(200, 450, 150, 100);
+	*/
+
+		function random_rgba() {
+			var o = Math.round, r = Math.random, s = 244;
+			return 'rgba(' + o(r()*s +11) + ',' + o(r()*s +11) + ',' + o(r()*s +11) + ',' + r().toFixed(1) + ')';
+		}
+	</script>
+</body>
+</html>
