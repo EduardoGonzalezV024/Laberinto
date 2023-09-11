@@ -19,19 +19,33 @@
         var cv = document.getElementById('mycanvas');
 		var ctx = cv.getContext('2d');
 
-        var walls = [];
-
 		//Generacion del laberinto
-		const blockSize = 60;
+		const mazeSize = 600;
+		const blockSize = mazeSize * 0.1;
 		var blockX = 0;
 		var blockY = 0;
-		const goal = 600;
+		const goal = mazeSize - blockSize;
 		var dir = 1;
 		var cont = 0;
 
-		while(blockX < goal || blockY < goal){
-			walls.push(new Wall(blockX, blockY, blockSize, blockSize));
+		var maze = [];
 
+		for (x = 0; x < mazeSize; x += blockSize){
+			for (y = 0; y < mazeSize; y += blockSize){
+				maze[x][y] = "x:" + x + " - y:" + y; 
+			}
+		}
+
+		for (x = 0; x < mazeSize; x += blockSize){
+			for (y = 0; y < mazeSize; y += blockSize){
+				console.log(maze[x][y])
+			}
+		}
+
+		/*
+		walls.push(new Wall(blockX, blockY, blockSize, blockSize));
+
+		while(blockX < goal|| blockY < goal){
 			dir = Math.floor(Math.random()*4 + 1);
 
 			switch(dir){
@@ -39,15 +53,17 @@
 					if(blockY >= blockSize) blockY -= blockSize;
 					break;
 				case 2:
-					if(blockX <= cv.width - blockSize) blockX += blockSize;
+					if(blockX <= goal - blockSize) blockX += blockSize;
 					break;
 				case 3:
 					if(blockY <= cv.height - blockSize) blockY += blockSize;
 					break;
 				case 4:
-					if(blockX >= blockSize) blockX -= blockSize;
+					if(blockX > blockSize) blockX -= blockSize;
 					break;
 			}
+
+			walls.push(new Wall(blockX, blockY, blockSize, blockSize));
 
 			console.log(cont + " - x:" + blockX + " - y:" + blockY);
 			cont ++;
@@ -58,6 +74,8 @@
 		{
 			walls[i].paint();
 		}
+
+		*/
     </script>
 </body>
 </html>

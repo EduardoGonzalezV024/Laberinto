@@ -1,10 +1,11 @@
 class Wall {
-    constructor(x, y, w, h, img) {
+    constructor(x, y, w, h, img, up, down, right, left) {
         this.x = x;
         this.y = y;
         this.w = w;
         this.h = h;
         this.img = img;
+        this.up
     }
 
     paint(){
