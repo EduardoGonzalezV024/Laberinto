@@ -12,11 +12,52 @@
 		:(
 	</canvas>
 
+	<script src="./wallClass.js"></script>
+
     <script type="text/javascript">
+
         var cv = document.getElementById('mycanvas');
 		var ctx = cv.getContext('2d');
 
-        
+        var walls = [];
+
+		//Generacion del laberinto
+		const blockSize = 60;
+		var blockX = 0;
+		var blockY = 0;
+		const goal = 600;
+		var dir = 1;
+		var cont = 0;
+
+		while(blockX < goal || blockY < goal){
+			walls.push(new Wall(blockX, blockY, blockSize, blockSize));
+
+			dir = Math.floor(Math.random()*4 + 1);
+
+			switch(dir){
+				case 1:
+					if(blockY >= blockSize) blockY -= blockSize;
+					break;
+				case 2:
+					if(blockX <= cv.width - blockSize) blockX += blockSize;
+					break;
+				case 3:
+					if(blockY <= cv.height - blockSize) blockY += blockSize;
+					break;
+				case 4:
+					if(blockX >= blockSize) blockX -= blockSize;
+					break;
+			}
+
+			console.log(cont + " - x:" + blockX + " - y:" + blockY);
+			cont ++;
+		}
+
+		ctx.fillStyle = "gray";
+		for(i=0; i< walls.length; i++)
+		{
+			walls[i].paint();
+		}
     </script>
 </body>
 </html>
