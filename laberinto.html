@@ -7,8 +7,8 @@
 			Laberinto
 	</title>
 </head>
-<body style="background-color: rgb(0, 0, 0);">
-    <canvas id="mycanvas" style="background-color: rgb(255, 255, 255);" tabindex='1' width="600" height="600">
+<body style="background-color: rgb(155, 155, 155);">
+    <canvas id="mycanvas" style="background-color: rgb(0, 0, 0);" tabindex='1' width="622" height="622">
 		:(
 	</canvas>
 
@@ -21,61 +21,35 @@
 
 		//Generacion del laberinto
 		const mazeSize = 600;
-		const blockSize = mazeSize * 0.1;
-		var blockX = 0;
-		var blockY = 0;
-		const goal = mazeSize - blockSize;
-		var dir = 1;
-		var cont = 0;
+		const blockSize = 60;
+		const forSize = mazeSize / blockSize;
+		
 
-		var maze = [];
+		wallsNode = [];
+		wallsNodeAux = [];
 
-		for (x = 0; x < mazeSize; x += blockSize){
-			for (y = 0; y < mazeSize; y += blockSize){
-				maze[x][y] = "x:" + x + " - y:" + y; 
+		for(x = 0; x < forSize; x++){
+			for(y = 0; y < forSize; y++){
+				wallsNodeAux.push(new Node(x, y, blockSize-2, blockSize-2));
+			}
+			wallsNode.push(wallsNodeAux);
+			wallsNodeAux = [];
+		}
+
+		for(i = 0; i < wallsNode.length; i++){
+			for(j = 0; j < wallsNode[i].length; j++){
+				if(i > 0){
+					
+				}
 			}
 		}
 
-		for (x = 0; x < mazeSize; x += blockSize){
-			for (y = 0; y < mazeSize; y += blockSize){
-				console.log(maze[x][y])
+		for(i = 0; i < wallsNode.length; i++){
+			for(j = 0; j < wallsNode[i].length; j++){
+				wallsNode[i][j].paint();
 			}
 		}
-
-		/*
-		walls.push(new Wall(blockX, blockY, blockSize, blockSize));
-
-		while(blockX < goal|| blockY < goal){
-			dir = Math.floor(Math.random()*4 + 1);
-
-			switch(dir){
-				case 1:
-					if(blockY >= blockSize) blockY -= blockSize;
-					break;
-				case 2:
-					if(blockX <= goal - blockSize) blockX += blockSize;
-					break;
-				case 3:
-					if(blockY <= cv.height - blockSize) blockY += blockSize;
-					break;
-				case 4:
-					if(blockX > blockSize) blockX -= blockSize;
-					break;
-			}
-
-			walls.push(new Wall(blockX, blockY, blockSize, blockSize));
-
-			console.log(cont + " - x:" + blockX + " - y:" + blockY);
-			cont ++;
-		}
-
-		ctx.fillStyle = "gray";
-		for(i=0; i< walls.length; i++)
-		{
-			walls[i].paint();
-		}
-
-		*/
+		
     </script>
 </body>
 </html>
