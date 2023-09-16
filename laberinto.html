@@ -7,12 +7,13 @@
 			Laberinto
 	</title>
 </head>
-<body style="background-color: rgb(255, 255, 255);">
-    <canvas id="mycanvas" style="background-color: rgb(0, 0, 0);" tabindex='1' width="602" height="602">
+<body style="background-color: rgb(58, 58, 58);">
+    <canvas id="mycanvas" style="background-color: rgb(255, 255, 255);" tabindex='1' width="602" height="602">
 		:(
 	</canvas>
 
 	<script src="./wallClass.js"></script>
+	<script src="./mazePath.js"></script>
 
     <script type="text/javascript">
 
@@ -22,56 +23,84 @@
 		//Generacion del laberinto
 		const mazeSize = 600;
 		const blockSize = 60;
-		
-		wallsNode = [];
-		wallsNodeAux = [];
+
+		ctx.fillStyle = "rgb(0,0,0)";
+        ctx.fillRect (600, 0, 2, 602);
+		ctx.fillRect (0, 600, 602, 2);
+
+		pathNode = [];
+		pathNodeAux = [];
+		endPath = true;
+		pathDir = 0;
 
 		for(x = 2; x < mazeSize; x += blockSize){
 			for(y = 2; y < mazeSize; y += blockSize){
-				wallsNodeAux.push(new Node(x, y, blockSize-2, blockSize-2));
+				pathNodeAux.push(new Node(x, y, blockSize-2, blockSize-2));
 			}
-			wallsNode.push(wallsNodeAux);
-			wallsNodeAux = [];
+			pathNode.push(pathNodeAux);
+			pathNodeAux = [];
 		}
 
-		for(y = 0; y < wallsNode.length; y++){
-			for(x = 0; x < wallsNode[y].length; x++){
+		for(y = 0; y < pathNode.length; y++){
+			for(x = 0; x < pathNode[y].length; x++){
 				if(x >= 1){
-					wallsNode[y][x].setLeft([y,x-1]);
+					pathNode[y][x].setLeft([y,x-1]);
 				}else{
-					wallsNode[y][x].setLeft(null);
+					pathNode[y][x].setLeft(null);
 				}
 
-				if(x <= wallsNode.length - 2){
-					wallsNode[y][x].setRight([y,x+1]);
+				if(x <= pathNode.length - 2){
+					pathNode[y][x].setRight([y,x+1]);
 				}
 				else{
-					wallsNode[y][x].setRight(null);
+					pathNode[y][x].setRight(null);
 				}
 
 				if(y >= 1){
-					wallsNode[y][x].setUp([y-1, x]);
+					pathNode[y][x].setUp([y-1, x]);
 				}
 				else{
-					wallsNode[y][x].setUp(null);
+					pathNode[y][x].setUp(null);
 				}
 
-				if(y <= wallsNode.length - 2){
-					wallsNode[y][x].setDown([y+1, x]);
+				if(y <= pathNode.length - 2){
+					pathNode[y][x].setDown([y+1, x]);
 				}
 				else{
-					wallsNode[y][x].setDown(null);
+					pathNode[y][x].setDown(null);
 				}
 			}
 		}
 
-		console.log(wallsNode);
+		console.log(pathNode);
 
-		for(i = 0; i < wallsNode.length; i++){
-			for(j = 0; j < wallsNode[i].length; j++){
-				wallsNode[i][j].paint();
+		for(i = 0; i < pathNode.length; i++){
+			for(j = 0; j < pathNode[i].length; j++){
+				pathNode[i][j].paint();
 			}
 		}
+
+		for(i=0;i<100;i++){console.log(Math.floor(pathDir = Math.random() * 4 + 1));}
+	
+		function mazePath(){
+			
+
+		}
+
+		while(endPath){
+			window.requestAnimationFrame(mazePath);
+			
+
+		}
+
+		window.requestAnimationFrame = (function () {
+			return window.requestAnimationFrame ||
+			window.webkitRequestAnimationFrame ||
+			window.mozRequestAnimationFrame ||
+			function (callback) {
+				window.setTimeout(callback, 20);
+			};
+		}());
 		
     </script>
 </body>
