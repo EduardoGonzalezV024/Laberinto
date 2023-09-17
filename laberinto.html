@@ -22,7 +22,7 @@
 
 		//Generacion del laberinto
 		const mazeSize = 600;
-		const blockSize = 60;
+		const blockSize = 120;
 
 		ctx.fillStyle = "rgb(0,0,0)";
         ctx.fillRect (600, 0, 2, 602);
@@ -30,9 +30,15 @@
 
 		pathNode = [];
 		pathNodeAux = [];
+		backtracing = [];
+		neighbors = [];
+		nextCell = new Node;
 		endPath = true;
-		pathDir = 0;
+		cont = 0;
+		posX = 0;
+		posY = 0;
 
+		//Maze cells creation;
 		for(x = 2; x < mazeSize; x += blockSize){
 			for(y = 2; y < mazeSize; y += blockSize){
 				pathNodeAux.push(new Node(x, y, blockSize-2, blockSize-2));
@@ -41,8 +47,11 @@
 			pathNodeAux = [];
 		}
 
+		//Cells neighbor assignment
 		for(y = 0; y < pathNode.length; y++){
 			for(x = 0; x < pathNode[y].length; x++){
+				pathNode[y][x].setThisCell([y,x]);
+
 				if(x >= 1){
 					pathNode[y][x].setLeft([y,x-1]);
 				}else{
@@ -72,35 +81,61 @@
 			}
 		}
 
-		console.log(pathNode);
+		pathNode[posX][posY].paint();
+		pathNode[posX][posY].visited = true;
+		backtracing.push([posX, posY]);
+	
+		//Maze back tracing draw
+		function mazePath(){
+			if(pathNode[posX][posY].up != null){
+				if(pathNode[pathNode[posX][posY].up[0]][pathNode[posX][posY].up[1]].visited == false){
+					neighbors.push(pathNode[pathNode[posX][posY].up[0]][pathNode[posX][posY].up[1]]);
+				}
+			}
+			if(pathNode[posX][posY].down != null){
+				if(pathNode[pathNode[posX][posY].down[0]][pathNode[posX][posY].down[1]].visited == false){
+					neighbors.push(pathNode[pathNode[posX][posY].down[0]][pathNode[posX][posY].down[1]]);
+				}
+			}
+			if(pathNode[posX][posY].right != null){
+				if(pathNode[pathNode[posX][posY].right[0]][pathNode[posX][posY].right[1]].visited == false){
+					neighbors.push(pathNode[pathNode[posX][posY].right[0]][pathNode[posX][posY].right[1]]);
+				}
+				
+			}
+			if(pathNode[posX][posY].left != null){
+				if(pathNode[pathNode[posX][posY].left[0]][pathNode[posX][posY].left[1]].visited == false){
+					neighbors.push(pathNode[pathNode[posX][posY].left[0]][pathNode[posX][posY].left[1]]);
+				}
+			}
 
-		for(i = 0; i < pathNode.length; i++){
-			for(j = 0; j < pathNode[i].length; j++){
-				pathNode[i][j].paint();
+			if(neighbors.length > 0){
+				nextCell = neighbors[Math.floor(Math.random()*neighbors.length)];	
+				neighbors = [];
+				nextCell.paint();
+				nextCell.visited = true;	
+				posX = nextCell.thisCell[0];
+				posY = nextCell.thisCell[1];
+				backtracing.push([posX, posY]);
+			}
+			else{
+				backtracing.pop();
+				posX = backtracing[backtracing.length-1][0];
+				posY = backtracing[backtracing.length-1][1];
 			}
 		}
 
-		for(i=0;i<100;i++){console.log(Math.floor(pathDir = Math.random() * 4 + 1));}
-	
-		function mazePath(){
-			
-
+		function draw() {
+			setTimeout(function() {
+				if(backtracing.length > 0){
+					mazePath();
+					console.log(backtracing);
+					draw();
+				}
+			}, 200)
 		}
 
-		while(endPath){
-			window.requestAnimationFrame(mazePath);
-			
-
-		}
-
-		window.requestAnimationFrame = (function () {
-			return window.requestAnimationFrame ||
-			window.webkitRequestAnimationFrame ||
-			window.mozRequestAnimationFrame ||
-			function (callback) {
-				window.setTimeout(callback, 20);
-			};
-		}());
+		draw();
 		
     </script>
 </body>
