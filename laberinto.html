@@ -112,31 +112,70 @@
 			if(neighbors.length > 0){
 				nextCell = neighbors[Math.floor(Math.random()*neighbors.length)];	
 				neighbors = [];
+				nextCell.visited = true;
+				
+				if(nextCell.thisCell[0] != posX){
+					if(nextCell.thisCell[0] > posX){
+						nextCell.wallLeft = null;
+					}
+
+					if(nextCell.thisCell[0] < posX){
+						pathNode[posX][posY].wallLeft = null;
+					}
+				}
+				else if(nextCell.thisCell[1] != posY){
+					if(nextCell.thisCell[1] > posY){
+						nextCell.wallUp = null;
+					}
+
+					if(nextCell.thisCell[1] < posY){
+						pathNode[posX][posY].wallUp = null;
+					}
+				}
+
+				pathNode[posX][posY].paint();
 				nextCell.paint();
-				nextCell.visited = true;	
+
 				posX = nextCell.thisCell[0];
 				posY = nextCell.thisCell[1];
 				backtracing.push([posX, posY]);
 			}
 			else{
 				backtracing.pop();
-				posX = backtracing[backtracing.length-1][0];
-				posY = backtracing[backtracing.length-1][1];
+
+				if(backtracing.length > 0){
+					posX = backtracing[backtracing.length-1][0];
+					posY = backtracing[backtracing.length-1][1];
+				}	
 			}
 		}
 
 		function draw() {
 			setTimeout(function() {
+				mazePath();
+				console.log(nextCell);
+
 				if(backtracing.length > 0){
-					mazePath();
-					console.log(backtracing);
 					draw();
 				}
-			}, 200)
+			}, 100)
 		}
 
 		draw();
-		
+
+		var playerImg = new Image();
+		playerImg.src = "caballero.jpg";
+
+		var player = new Wall(blockSize*0.1, blockSize*0.1, blockSize*0.75, blockSize*0.75);
+
+		ctx.beginPath();
+        playerImg.onload = function() {
+            ctx.drawImage(playerImg, player.x, player.y, player.w, player.h);
+        }
+
+		console.log("hola?")
+
+
     </script>
 </body>
 </html>
